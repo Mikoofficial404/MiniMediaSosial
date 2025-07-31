@@ -5,20 +5,21 @@ import Login from "./pages/auth/login.jsx";
 import PostsCreate from "./pages/public/post/create.jsx";
 import Dashboard from "./pages/public/index.jsx";
 import InstagramPost from "./pages/public/home/index.jsx";
-
+import Register from "./pages/auth/register.jsx";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
-         <Route path="user" element={<PublicLayout/>}>
-             <Route index element={<Dashboard />}/>
-            <Route path="create" element={<PostsCreate/>}/>
-             <Route path="home" element={<InstagramPost/>}/>
-         </Route>
+          <Route path="user" element={<PublicLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="create" element={<PostsCreate />} />
+            <Route path="home" element={<InstagramPost />} />
+          </Route>
 
-            <Route path="login" element={<Login/>}/>
+          <Route index element={<Login />} />
+          <Route path="register" element={<Register />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -17,6 +17,7 @@ class CommentsContoller extends Controller
             'content' => 'required|max:255|string'
         ]);
 
+
         if($validate->fails())
         {
             return response()->json([
@@ -25,17 +26,20 @@ class CommentsContoller extends Controller
             ], 400);
         }
 
-        $comment = Comment::create([
-            'posts_id' => $request->posts_id,
-            'user_id' => $user->id,
-            'content' => $request->content,
-        ]);
+      $comment = Comment::create([
+    'posts_id' => $request->posts_id,
+    'user_id' => $user->id,
+    'content' => $request->content,
+]);
 
-        return response()->json([
-            'messages' => 'Comment Created',
-            'success' => true,
-            'data' => $comment,
-        ]);
+// Load the user relationship for the response
+$comment->load('user');
+
+return response()->json([
+    'messages' => 'Comment Created',
+    'success' => true,
+    'data' => $comment,
+]);
     }
 
 
