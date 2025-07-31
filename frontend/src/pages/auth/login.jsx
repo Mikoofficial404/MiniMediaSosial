@@ -73,26 +73,20 @@ export default function Login() {
                     <div className="mx-auto w-full max-w-sm lg:w-96">
                         <div>
                             <img
-                                alt="Your Company"
-                                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                                className="h-10 w-auto"
+                                alt="Instagram"
+                                src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg"
+                                className="h-8 w-auto"
                             />
                             <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">
                                 Sign in to your account
                             </h2>
-                            <p className="mt-2 text-sm leading-6 text-gray-500">
-                                Not a member?{' '}
-                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                    Start a 14 day free trial
-                                </a>
-                            </p>
                         </div>
 
                         <div className="mt-10">
                             <div>
                                 {error && <p className="text-red-500">{error}</p>}
                                 <form action="#" onSubmit={handleSubmit} className="space-y-6">
-                                    <div>
+                                <div>
                                         <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                                             Email address
                                         </label>
@@ -161,10 +155,10 @@ export default function Login() {
                         </div>
                     </div>
                 </div>
-                <div className="relative hidden w-0 flex-1 lg:block">
+                <div className="relative hidden w-0 flex-1 lg:block" style={{height: '100vh'}}>
                     <img
                         alt=""
-                        src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1908&q=80"
+                        src="https://images.unsplash.com/photo-1496917756835-20cb06e75b4e"
                         className="absolute inset-0 h-full w-full object-cover"
                     />
                 </div>

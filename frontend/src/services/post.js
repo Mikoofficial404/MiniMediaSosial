@@ -2,12 +2,17 @@ import {API} from "../api/index.js";
 
 
 export const getPosts = async () => {
-    const {data} = await API.get("/v1/posts", {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-    });
-    return data.data;
+    try {
+        const {data} = await API.get("/v1/posts", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+        });
+        return data.data;
+    } catch (error) {
+        console.error("Error fetching posts:", error);
+        throw error;
+    }
 }
 
 

@@ -27,17 +27,20 @@ Route::prefix('v1')->group(function(){
     Route::put('{id}', [PostsController::class, 'update']); // Update Data
     Route::delete('{id}', [PostsController::class, 'destroy']); //Menghapus Data
     });
-
+    //menghandel comments
      Route::middleware(JWTMiddleware::class)->prefix('comments')->group(function(){
         Route::post('/', [CommentsContoller::class, 'store']);
         Route::delete('{id}', [CommentsContoller::class, 'destroy']);
     });
 
+
+    //menghandel likes
       Route::middleware(JWTMiddleware::class)->prefix('likes')->group(function(){
         Route::post('/', [LikesController::class, 'store']);
         Route::delete('{id}', [LikesController::class, 'destroy']);
     });
 
+    // Menghandel Messages
       Route::middleware(JWTMiddleware::class)->prefix('messages')->group(function(){
         Route::post('/', [MessagesController::class, 'store']);
         Route::get('{id}', [MessagesController::class, 'show']);

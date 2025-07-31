@@ -11,7 +11,7 @@ class LikesController extends Controller
 {
     public function store(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticated();
+        $user = JWTAuth::parseToken()->authenticate();
         $validate = Validator::make($request->all(), [
             'posts_id' => 'required',
         ]);

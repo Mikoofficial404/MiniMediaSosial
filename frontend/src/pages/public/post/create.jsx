@@ -80,7 +80,7 @@ export default function PostForm() {
 
             {/* Cover Photo */}
             <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Cover Photo</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Photo</label>
                 <div className="flex items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-6">
                     {previewImage ? (
                         <div className="relative">

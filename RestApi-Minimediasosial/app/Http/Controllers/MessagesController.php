@@ -12,7 +12,7 @@ class MessagesController extends Controller
     public function store(Request $request)
     {
 
-        $user = JWTAuth::parseToken()->authenticated();
+        $user = JWTAuth::parseToken()->authenticate();
         $validate = Validator::make($request->all(), [
             'reciver_id' => 'required',
             'messages_content' => 'required',

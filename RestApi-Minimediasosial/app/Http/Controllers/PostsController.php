@@ -20,45 +20,45 @@ class PostsController extends Controller
     }
 
     public function store(Request $request)
+{
+    $user = JWTAuth::parseToken()->authenticate();
+    $validate = Validator::make($request->all(), [
+        'content' => 'required|string|max:255',
+        'image_path' => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048', // ini 'image_path'
+    ]);
+
+    if($validate->fails())
     {
-        $user = JWTAuth::parseToken()->authenticated();
-        $validate = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'content' => 'required|string|max:255',
-            'image'   => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
-        ]);
+        return response()->json([
+            'success' => false,
+            'messages' => $validate->errors(),
+        ], 400);
+    }
 
-        if($validate->fails())
-        {
-            return response()->json([
-                'success' => false,
-                'messages' => $validate->errors(),
-            ], 400);
-        }
+    $imagePath = null;
 
-        if ($request->hasFile('image')) {
-        $file = $request->file('image');
+    if ($request->hasFile('image_path')) {
+        $file = $request->file('image_path');
         $filename = time() . '_' . $file->getClientOriginalName();
         $file->move(public_path('uploads/images'), $filename);
         $imagePath = 'uploads/images/' . $filename;
-        } else {
-            $imagePath = null;
-        }
-
-        // jika validasi  berhasil lanjut
-
-        $posts = Post::create([
-            'user_id' => $user->id,
-            'content' => $request->content,
-            'image_url' => $imagePath,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'messages' => 'Posts Created',
-            'data' => $posts,
-        ], 201);
+    }else {
+        $imagePath = null;
     }
+
+    $posts = Post::create([
+        'user_id' => $user->id,
+        'content' => $request->content,
+        'image_path' => $imagePath,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'messages' => 'Posts Created',
+        'data' => $posts,
+    ], 201);
+}
+
 
     public function show($id)
     {

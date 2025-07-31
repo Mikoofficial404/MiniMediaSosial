@@ -19,4 +19,4 @@ API.interceptors.request.use(
         return Promise.reject(error);
     }
 );
-export const ProductImageStorage = `${url}/storage`;
+export const PostsImageStorage = `${url}/storage`;
