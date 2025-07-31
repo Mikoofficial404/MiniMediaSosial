@@ -36,7 +36,6 @@ npm run dev
 cd RestApi-Minimediasosia
 ```
 ## 📦 Install dependencies:
-With bun
 ```bash
 composer install
 ```
@@ -65,6 +64,6 @@ php artisan serve
 ```
 
 ## 📷 Demo
- 
+<img width="1898" height="992" alt="Image" src="https://github.com/user-attachments/assets/cacd2e8c-4312-47bf-8137-28514e11e8ae" />
 
 
