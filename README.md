@@ -2,8 +2,8 @@
 
 ## 📦 Clone Repository
 ```bash
-git clone https://github.com/username/repo-name.git
-cd repo-name
+git clone https://github.com/Mikoofficial404/MiniMediaSosial.git
+cd MiniMediaSosial
 ```
 
 ## 📁 Folder React
