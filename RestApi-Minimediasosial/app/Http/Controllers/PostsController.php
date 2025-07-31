@@ -108,7 +108,23 @@ class PostsController extends Controller
 
     public function destroy(int $id)
     {
+       $user = JWTAuth::parseToken()->authenticate();
         $post = Post::find($id);
+
+        if (!$post) {
+            return response()->json([
+                'message' => 'Post not found',
+                'success' => false,
+            ], 404);
+        }
+
+
+        if ($post->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Unauthorized: You can only delete your own posts',
+                'success' => false,
+            ], 403);
+        }
 
         $post->delete();
 

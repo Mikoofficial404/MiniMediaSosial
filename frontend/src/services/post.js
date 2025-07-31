@@ -30,3 +30,18 @@ export const createPost = async (payload) => {
     }
 
 }
+
+export const deletePost = async (id) => {
+    try{
+        const token = localStorage.getItem("accessToken");
+        const response = await API.delete(`/v1/posts/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    }catch (e) {
+        console.log(e);
+        throw e;
+    }
+}

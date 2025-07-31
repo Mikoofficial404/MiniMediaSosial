@@ -1,7 +1,9 @@
 import { HeartIcon, ChatBubbleOvalLeftIcon, BookmarkIcon, EllipsisHorizontalIcon, PaperAirplaneIcon, FaceSmileIcon } from '@heroicons/react/24/outline'
+import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import {useEffect, useState} from "react";
-import {getPosts} from "../../../services/post.js";
+import {getPosts, deletePost} from "../../../services/post.js";
 import {createComments, deleteComment} from "../../../services/comments.js";
+import {createLike, deleteLike} from "../../../services/like.js";
 
 const BASE_URL = "http://127.0.0.1:8000";
 
@@ -12,6 +14,12 @@ export default function InstagramPost() {
     const [error, setError] = useState(false);
     const [commentInputs, setCommentInputs] = useState({});
     const [submittingComments, setSubmittingComments] = useState({});
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [likedPosts, setLikedPosts] = useState(new Set());
+    const [likeCounts, setLikeCounts] = useState({});
+    
+    // Get current logged in user
+    const currentUser = JSON.parse(localStorage.getItem("user"));
 
     const fetchPosts = async () => {
         try {
@@ -19,6 +27,22 @@ export default function InstagramPost() {
             setError(null);
             const postsData = await getPosts();
             setPosts(postsData);
+            
+            // Initialize like states
+            const likedSet = new Set();
+            const counts = {};
+            postsData.forEach(post => {
+                counts[post.id] = post.likes?.length || 0;
+                // Check if current user has liked this post
+                if (post.likes && currentUser) {
+                    const userLiked = post.likes.some(like => like.user_id === currentUser.id);
+                    if (userLiked) {
+                        likedSet.add(post.id);
+                    }
+                }
+            });
+            setLikedPosts(likedSet);
+            setLikeCounts(counts);
         } catch (error) {
             console.log(error);
             setError("Gagal Ambil data posts");
@@ -27,6 +51,10 @@ export default function InstagramPost() {
             setLoading(false);
         }
     };
+
+    const toggleDropDown = (id) => {
+        setOpenDropdownId(openDropdownId === id ? null: id);
+    }
 
     useEffect(() => {
         fetchPosts();
@@ -87,13 +115,76 @@ export default function InstagramPost() {
             const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
             if (confirmDelete) {
                 await deleteComment(id);
-                await fetchPosts(); 
+                await fetchPosts();
             }
         }catch (e) {
             console.log(e);
             throw e;
         }
     }
+
+    const handlePostDelete = async (id) => {
+        try{
+            const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+            if(confirmDelete){
+                await deletePost(id);
+                await fetchPosts();
+            }
+        }catch (e) {
+            console.log(e);
+            throw e;
+        }
+    }
+
+    const handleLikeToggle = async (postId) => {
+        if (!currentUser) {
+            alert("Silakan login terlebih dahulu untuk melakukan like");
+            return;
+        }
+
+        try {
+            const isLiked = likedPosts.has(postId);
+            
+            if (isLiked) {
+                // Unlike - find the like ID first
+                const post = posts.find(p => p.id === postId);
+                const userLike = post.likes?.find(like => like.user_id === currentUser.id);
+                
+                if (userLike) {
+                    await deleteLike(userLike.id);
+                    setLikedPosts(prev => {
+                        const newSet = new Set(prev);
+                        newSet.delete(postId);
+                        return newSet;
+                    });
+                    setLikeCounts(prev => ({
+                        ...prev,
+                        [postId]: Math.max(0, (prev[postId] || 0) - 1)
+                    }));
+                }
+            } else {
+                // Like
+                const payload = {
+                    posts_id: postId
+                };
+                await createLike(payload);
+                setLikedPosts(prev => {
+                    const newSet = new Set(prev);
+                    newSet.add(postId);
+                    return newSet;
+                });
+                setLikeCounts(prev => ({
+                    ...prev,
+                    [postId]: (prev[postId] || 0) + 1
+                }));
+            }
+        } catch (error) {
+            console.error("Error toggling like:", error);
+            alert("Gagal melakukan like/unlike. Silakan coba lagi.");
+        }
+    };
+
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-10 space-y-2">
@@ -133,7 +224,21 @@ export default function InstagramPost() {
                                 </div>
                                 <p className="text-sm font-semibold">{post.user?.fullname || 'User'}</p>
                             </div>
-                            <EllipsisHorizontalIcon className="w-5 h-5 text-gray-800" />
+                            <div className="relative">
+                                <button onClick={() => toggleDropDown(post.id)}>
+                                    <EllipsisHorizontalIcon className="w-5 h-5 text-gray-800" />
+                                </button>
+                                {openDropdownId === post.id && currentUser && post.user && currentUser.id === post.user.id && (
+                                    <div className="absolute right-0 mt-2 w-28 bg-white border rounded shadow z-10">
+                                        <button
+                                            className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                                            onClick={() => handlePostDelete(post.id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         {post.image_path && (
                             <img
@@ -147,8 +252,19 @@ export default function InstagramPost() {
                         <div className="px-4 pt-3 pb-2">
                             <div className="flex justify-between items-center">
                                 <div className="flex gap-4">
-                                    <button className="text-gray-800 hover:text-gray-600">
-                                        <HeartIcon className="w-6 h-6" />
+                                    <button 
+                                        className={`hover:scale-110 transition-transform ${
+                                            likedPosts.has(post.id) 
+                                                ? 'text-red-500' 
+                                                : 'text-gray-800 hover:text-gray-600'
+                                        }`}
+                                        onClick={() => handleLikeToggle(post.id)}
+                                    >
+                                        {likedPosts.has(post.id) ? (
+                                            <HeartSolidIcon className="w-6 h-6" />
+                                        ) : (
+                                            <HeartIcon className="w-6 h-6" />
+                                        )}
                                     </button>
                                     <button className="text-gray-800 hover:text-gray-600">
                                         <ChatBubbleOvalLeftIcon className="w-6 h-6" />
@@ -163,7 +279,7 @@ export default function InstagramPost() {
                             </div>
                         </div>
                         <div className="px-4">
-                            <p className="text-sm font-semibold">{post.likes?.length || 0} likes</p>
+                            <p className="text-sm font-semibold">{likeCounts[post.id] || 0} likes</p>
                             {post.comments && post.comments.length > 0 && (
                                 <p className="text-sm text-gray-600 mt-1">
                                     {post.comments.length} comment{post.comments.length !== 1 ? 's' : ''}
@@ -197,12 +313,14 @@ export default function InstagramPost() {
                                                 <p className="text-sm">
                                                     <span className="font-semibold">{comment.user?.fullname || 'User'}</span>
                                                     {' '}{comment.content}
-                                                    <button
-                                                        className="ml-2 text-xs text-red-500 hover:underline"
-                                                        onClick={() => handleDelete(comment.id)}
-                                                    >
-                                                        Hapus
-                                                    </button>
+                                                    {currentUser && comment.user && currentUser.id === comment.user.id && (
+                                                        <button
+                                                            className="ml-2 text-xs text-red-500 hover:underline"
+                                                            onClick={() => handleDelete(comment.id)}
+                                                        >
+                                                            Hapus
+                                                        </button>
+                                                    )}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
                                                     {comment.created_at ? new Date(comment.created_at).toLocaleDateString() : 'Unknown date'}
