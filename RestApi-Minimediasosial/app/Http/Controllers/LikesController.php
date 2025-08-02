@@ -38,6 +38,7 @@ class LikesController extends Controller
 
     public function destroy($id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $like = Like::find($id);
 
         $like->delete();

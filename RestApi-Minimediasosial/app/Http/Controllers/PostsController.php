@@ -62,8 +62,8 @@ class PostsController extends Controller
 
     public function show($id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $post = Post::find($id);
-
         if(!$post){
             return response()->json([
                 'messages' => 'Product Not Found',
@@ -80,6 +80,7 @@ class PostsController extends Controller
 
     public function update(Request $request, $id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $validate = Validator::make($request->all(),[
             'content' => 'required|string|max:255',
             'image_url' => 'nullable',

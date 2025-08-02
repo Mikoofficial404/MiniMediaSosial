@@ -30,21 +30,22 @@ class CommentsContoller extends Controller
     'posts_id' => $request->posts_id,
     'user_id' => $user->id,
     'content' => $request->content,
-]);
+    ]);
 
-// Load the user relationship for the response
-$comment->load('user');
 
-return response()->json([
-    'messages' => 'Comment Created',
-    'success' => true,
-    'data' => $comment,
-]);
+        $comment->load('user');
+
+        return response()->json([
+            'messages' => 'Comment Created',
+            'success' => true,
+            'data' => $comment,
+        ]);
     }
 
 
     public function destroy($id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $comment = Comment::find($id);
 
         $comment->delete();

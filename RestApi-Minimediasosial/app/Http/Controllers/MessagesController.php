@@ -41,6 +41,7 @@ class MessagesController extends Controller
 
     public function show($id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $message = Message::find($id);
 
         return response()->json([
@@ -52,6 +53,7 @@ class MessagesController extends Controller
 
     public function getMessage(int $user_id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $message = Message::where('reciver_id', $user_id)->get();
 
         return response()->json([
@@ -63,6 +65,7 @@ class MessagesController extends Controller
 
     public function destroy($id)
     {
+         $user = JWTAuth::parseToken()->authenticate();
         $message = Message::find($id);
 
         $message->delete();
